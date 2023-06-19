@@ -7,10 +7,10 @@ with open('example1.json', 'r') as f:
 
 nrows = puzzle['nrows']
 ncols = puzzle['ncols']
-rows = puzzle['rows']
-cols = puzzle['cols']
+row_clues = puzzle['row_clues']
+col_clues = puzzle['col_clues']
 
-print(puzzle)
+# print(puzzle)
 
 BLANK = ' '
 FILLED = '1'
@@ -18,7 +18,42 @@ EMPTY = '0'
 
 
 solution = [[BLANK for i in range(ncols)] for j in range(nrows)]
-print(solution)
+solution = [BLANK for i in range(nrows * ncols)]
+
+def get_row(solution, r, nrows, ncols):
+  starti = r * ncols
+  endi = starti + ncols
+  ret = []
+  for i in range(starti, endi):
+    ret.append(solution[i])
+  return ret
+
+def set_row(solution, row, r, nrows, ncols):
+  starti = r * ncols
+  endi = starti + ncols
+  ri = 0
+  for i in range(starti, endi):
+    solution[i] = row[ri]
+    ri += 1
+  return solution
+
+def get_col(solution, c, nrows, ncols):
+  starti = c
+  endi = nrows * ncols
+  ret = []
+  for i in range(starti, endi, ncols):
+    ret.append(solution[i])
+  return ret
+
+def set_col(solution, col, c, nrows, ncols):
+  starti = c
+  endi = nrows * ncols
+  ri = 0
+  for i in range(starti, endi, ncols):
+    solution[i] = col[ri]
+    ri += 1
+  return solution
+
 
 
 
@@ -81,20 +116,54 @@ def solve_row(clue, grid):
   return and_candidates(grid, candidates)
 
 
+def solve_rows(row_clues, solution):
+  for r in range(nrows):
+    soln_row = solve_row(row_clues[r], get_row(solution, r, nrows, ncols))
+    set_row(solution, soln_row, r, nrows, ncols)
+  return solution
 
-print(solve_row([3], solution[0]))
-print(solve_row([1], solution[0]))
-print(solve_row([4], solution[0]))
-print(solve_row([5], solution[0]))
+def transpose(l):
+  return deepcopy(list(map(list, zip(*l))))
+
+def solve_cols(col_clues, solution):
+  # ret = deepcopy(transpose(solution))
+  for c in range(ncols):
+  # for i, row in enumerate(solution):
+    soln_row = solve_row(col_clues[c], get_col(solution, c, nrows, ncols))
+    # ret[i] = deepcopy(soln_row)
+    set_col(solution, soln_row, c, nrows, ncols)
+  return solution
+
+def print_grid(grid, nrows, ncols):
+  print('---')
+  for r in range(nrows):
+    row = get_row(grid, r, nrows, ncols)
+    print(str(row))
+  print('---')
+
+for i in range(5):
+  solution = solve_rows(row_clues, solution)
+  print_grid(solution, nrows, ncols)
+  solution = solve_cols(col_clues, solution)
+  print_grid(solution, nrows, ncols)
+  print()
+  print()
+
+# for i in range(2):
+#   ans = solve_rows(row_clues, solution)
+#   solution = deepcopy(ans)
+#   print_grid(solution)
+
+#   ans = solve_cols(col_clues, solution)
+#   solution = deepcopy(ans)
+#   print_grid(solution)
+#   print()
 
 
-
-
-
-
-
-
-
-
-
-
+# ans = solve_cols(row_clues, solution)
+# solution = deepcopy(ans)
+# print_grid(solution)
+# ret = deepcopy(transpose(solution))
+# print_grid(ret)
+# print_grid(transpose(ret))
+# print_grid(transpose(transpose(solution)))
