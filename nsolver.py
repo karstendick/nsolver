@@ -2,7 +2,7 @@ import json
 from itertools import product
 from copy import deepcopy
 
-with open('example1.json', 'r') as f:
+with open('example15x15.json', 'r') as f:
   puzzle = json.load(f)
 
 nrows = puzzle['nrows']
@@ -127,7 +127,9 @@ def print_grid(grid, nrows, ncols):
     print(str(row))
   print('---')
 
+num_passes = 0
 for i in range(nrows * ncols):
+  print(f'Pass {num_passes}:')
   solution = solve_rows(row_clues, solution)
   print_grid(solution, nrows, ncols)
   solution = solve_cols(col_clues, solution)
@@ -135,5 +137,6 @@ for i in range(nrows * ncols):
   print()
   print()
   if is_solved(solution):
-    print('Solved it!')
+    print(f'Solved it in {num_passes}!')
     break
+  num_passes += 1
